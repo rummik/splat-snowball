@@ -1,6 +1,6 @@
 <!doctype html>
 <style>
-html, body {
+html, body, pre {
 	margin: 0;
 	padding: 0;
 }
@@ -11,9 +11,32 @@ body {
 	line-height: 5vh;
 	font-family: sans-serif;
 	color: #008080;
-	white-space: pre;
 	background: #FAEBD7;
 }
+
+pre {
+	font-family: inherit;
+}
+
+.key {
+	width: 2em;
+	height: 2em;
+	text-align: center;
+	line-height: 2em;
+	border: 1px solid #008080;
+	border-radius: 3px;
+	position: fixed;
+	cursor: pointer;
+}
+	.key#up {
+		right: 1em;
+		top: 1em;
+	}
+
+	.key#down {
+		right: 1em;
+		bottom: 1em;
+	}
 </style>
 
 <script>
@@ -26,12 +49,39 @@ addEventListener('keydown', event => {
 	let lineHeight = oneVH * 5;
 
 	switch (event.keyCode) {
-		case 38: scrollBy(0, -lineHeight + 1); break;
+		case 38: scrollBy(0, -lineHeight); break;
 		case 40: scrollBy(0,  lineHeight); break;
 	}
 });
+
+addEventListener(
+	'touchstart',
+	event => {
+		if (event.target.matches('#up') || event.target.matches('#down')) {
+			event.preventDefault();
+
+			let interval = setInterval(
+				() => dispatchEvent(new KeyboardEvent('keydown', {
+					keyCode: event.target.matches('#up') ? 38 : 40,
+				})),
+				50,
+			);
+
+			let touchend;
+			addEventListener('touchend', touchend = () => {
+				clearInterval(interval);
+				removeEventListener('touchend', touchend);
+			});
+		}
+	},
+	{ passive: false },
+);
 </script>
 
+<a id="up" class="key">&uarr;</a>
+<a id="down" class="key">&darr;</a>
+
+<pre>
 Snowballs in November
 <!--Put your mouse at your down arrow of your
 scroll bar &amp; Hold...-->
@@ -320,3 +370,4 @@ In this snowball fight no one gets frozen fingers and toes.
 PASS IT ON TO ALL YOUR FRIENDS
 
 SPLAT!!!!
+</pre>
