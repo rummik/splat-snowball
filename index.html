@@ -54,28 +54,32 @@ addEventListener('keydown', event => {
 	}
 });
 
-addEventListener(
-	'touchstart',
-	event => {
-		if (event.target.matches('#up') || event.target.matches('#down')) {
-			event.preventDefault();
+function translateToKeyEvent(event) {
+	if (!event.target.matches('#up') && !event.target.matches('#down')) {
+		return;
+	}
 
-			let interval = setInterval(
-				() => dispatchEvent(new KeyboardEvent('keydown', {
-					keyCode: event.target.matches('#up') ? 38 : 40,
-				})),
-				50,
-			);
+	event.preventDefault();
 
-			let touchend;
-			addEventListener('touchend', touchend = () => {
-				clearInterval(interval);
-				removeEventListener('touchend', touchend);
-			});
+	let interval = setInterval(
+		() => dispatchEvent(new KeyboardEvent('keydown', {
+			keyCode: event.target.matches('#up') ? 38 : 40,
+		})),
+		50,
+	);
+
+	let touchend;
+	addEventListener(
+		event.type == 'touchstart' ? 'touchend' : 'mouseup',
+		touchend = () => {
+			clearInterval(interval);
+			removeEventListener('touchend', touchend);
 		}
-	},
-	{ passive: false },
-);
+	);
+}
+
+addEventListener('mousedown', translateToKeyEvent);
+addEventListener('touchstart', translateToKeyEvent, { passive: false });
 </script>
 
 <a id="up" class="key">&uarr;</a>
